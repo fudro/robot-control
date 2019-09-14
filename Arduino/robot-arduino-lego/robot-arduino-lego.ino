@@ -32,7 +32,6 @@ bool          moved = false;  //Track whether the motor movement has completed.
 
 void setup() {
   Serial.begin(115200);
-  Serial.println();
   Serial.println("Robot Start!");
   
   AFMS.begin();  // start motorshield object with the default frequency of 1.6KHz
@@ -53,4 +52,5 @@ void setup() {
 
 void loop() {
   //moveForward(80);
+  checkCommands();
 }
