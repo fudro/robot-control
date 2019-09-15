@@ -8,12 +8,13 @@
 
 
 void checkCommands(){
-  String t;
-  String commandName;
-  int argument;
-  char  onesPlace = 0;
-  char  tensPlace = 0;
-  char  hundredthsPlace = 0;
+  String  t;
+  String  commandName;
+  char    onesPlace = 0;
+  char    tensPlace = 0;
+  char    hundredthsPlace = 0;
+  int     argument;
+  
   while(Serial.available()) {
     t += (char)Serial.read();
   }
@@ -39,44 +40,32 @@ void checkCommands(){
     Serial.println(commandName);
     
     if (separatorIndex > 0) {                 //Check if the separator character was found in the message. This means that the target function of the message requires a parameter.
-      //TODO: Check parameter based commands:
-        //calculate and store the argument
-          //Combine the place values to find the argument value. (Convert from string to integer)
-        //Check command string against known commands and run the matching case
-        //Each command case has the function call with the argument variable as the passed value.
       for (int j = separatorIndex + 1; j < t.length(); j++) {
-        if (t[j] == 13) {                                            //Look for the end of the argument value by detecting the carriage return (13).
+        if (t[j] == 13) {                                           //Look for the end of the argument value by detecting the carriage return (13).
           Serial.print("CR Index: ");
           Serial.println(j);
           if (j - separatorIndex > 1 && j - separatorIndex < 5) {   //Check if the argument has 1-3 digits.
-            bool argumentFound = false;
-            if (j-1 != separatorIndex && argumentFound == false) {                         //Store the available place values of the argument
+            if (j-1 != separatorIndex) {                            //Store the available place values of the argument
               onesPlace = t[j-1];
+              if (j-2 != separatorIndex) {                          //Conditionals are nested so that you can only have a tens place digit if you had a ones place digit and so on.
+                tensPlace = t[j-2];
+                if (j-3 != separatorIndex) {
+                  hundredthsPlace = t[j-3];
+                }
+              }
             }
-            else {
-              argumentFound = true;
-            }
-            if (j-2 != separatorIndex && argumentFound == false) {
-              tensPlace = t[j-2];
-            }
-            else {
-              argumentFound = true;
-            }
-            if (j-3 != separatorIndex  && argumentFound == false) {
-              hundredthsPlace = t[j-3];
-            }
-            else {
-              argumentFound = true;
-            }
+            //TODO:
+            //Once all of the place values have been assigned, convert them to integers and add together.
+            //Store the calulated argument vlaue
           }
           else {
-            Serial.println("Invalid Argument");     //Throws for too many arguments AND no arguments.
+            Serial.println("Invalid Argument");   //Throws for too many arguments AND no arguments.
             Serial.println();
           }
-          break;                                            //Stop the loop once the carriage return is found.
+          break;                                  //Stop the loop once the carriage return is found.
         }
       }
-      if (onesPlace != 0) {                               //if the argument has at least one digit, print the combined value
+      if (onesPlace != 0) {                       //if the argument has at least one digit, print the combined value
         Serial.println("Argument Value: "); 
         if (hundredthsPlace != 0) {
           Serial.print(hundredthsPlace);
@@ -87,8 +76,12 @@ void checkCommands(){
         Serial.println(onesPlace);
         Serial.println();
       }
+      //TODO:
+      //Compare command string to all available commands that accept a parameter
+      //Check command string against known commands and run the matching case
+      //Each command case has the function call with the argument variable as the passed value.
     }
-    else {                                                 //If no separator is found in the message, compare with the commands that take no arguments
+    else {                                        //If no separator is found in the message, compare with the commands DO NOT accept parameters.
       //TODO: Check non parameter commands
 //    if(t == "hello\r\n") {
 //      Serial.print("hi\n");
