@@ -1,8 +1,8 @@
 /*************************
  * This code provides wireless serial communication using an RN-42 bluetooth module.
  * 
- * The robot can receive serial commands consisting of a function name string and a 3 digit value integer as a passed argument.
- * The format of the message is "functionName_XXX" where the name of the function and the pass argument are separated by an underscore.
+ * The robot can receive serial commands consisting of a function name and a 3 digit argument value passed as a single combined message string.
+ * The format of the message string is ["functionName"_"argumentValue"] (e.g. "foobar_123"), where the name of the function and the passed argument value are separated by an underscore character ("_").
  * Relevant ASCII values: 95 = underscore ("_"), 13 = cariage return (CR), 10 = new line/line feed (LF).
  * **********************/
 
