@@ -2,23 +2,28 @@
  * This code provides wireless serial communication using an RN-42 bluetooth module.
  * 
  * The robot can receive serial commands consisting of a function name and a 3 digit argument value passed as a single combined message string.
+ * The argument value can be 1-3 digits. If less than three digits, the value should be entered without leading or trailing zeroes.
  * The format of the message string is ["functionName"_"argumentValue"] (e.g. "foobar_123"), where the name of the function and the passed argument value are separated by an underscore character ("_").
- * Relevant ASCII values: 95 = underscore ("_"), 13 = cariage return (CR), 10 = new line/line feed (LF).
+ * The underscore is only used with commands that require a parameter. If no parameter is required, the message string should just be the function name.
+ * Relevant ASCII values
+ *  95 = underscore ("_")
+ *  13 = cariage return (CR)
+ *  10 = new line/line feed (LF).
  * **********************/
 
 
 void checkCommands(){
-  String  t;
-  String  commandName;
-  char    onesPlace = 0;
-  char    tensPlace = 0;
-  char    hundredthsPlace = 0;
-  int     argument;
+  String  t;    //the incoming message string
+  String  commandName;    //characters of the command name
+  char    hundredthsPlace = 0;    //first digit of the argument value
+  char    tensPlace = 0;  //second digit of the argument value
+  char    onesPlace = 0;  //third digit of the argument value
+  int     argument;   //the numerical value of the combined argument digits
   
   while(Serial.available()) {
     t += (char)Serial.read();
   }
-  if(t.length()) {
+  if(t.length()) {    //if incoming characters have been received
     Serial.print("Total String Length: ");
     Serial.println((int)t.length());          //This statement prints a value that is always 2 more than the number of characters entered. This accounts for the "\r\n" (carriage return and new line) characters automatically appended to each message.
     Serial.print("Command Message: ");
@@ -26,7 +31,7 @@ void checkCommands(){
     for (int i = 0; i < t.length(); i++ ) {   //Search the string for the separator character (underscore "_"). Sequentially print each character of the entire message up to the separator character (underscore "_")
       Serial.print(t[i]);                     //Print each read character (including underscore separator but NOT including carriage return and new line).
       if (t[i] != 95) {                       //If the read character is NOT the separator: 95 = underscore ("_").
-        if (separatorIndex == 0) {            //Only record command characters up until the separator has been found.
+        if (separatorIndex == 0) {            //Only record command characters if the separator has not been found.
           commandName += (char)t[i];          //Add the read character to the command string.
         }
       }
@@ -40,7 +45,7 @@ void checkCommands(){
     Serial.println(commandName);
     
     if (separatorIndex > 0) {                 //Check if the separator character was found in the message. This means that the target function of the message requires a parameter.
-      for (int j = separatorIndex + 1; j < t.length(); j++) {
+      for (int j = separatorIndex + 1; j < t.length(); j++) {       //start search at the next character AFTER the underscore.
         if (t[j] == 13) {                                           //Look for the end of the argument value by detecting the carriage return (13).
           Serial.print("CR Index: ");
           Serial.println(j);
@@ -59,7 +64,7 @@ void checkCommands(){
             //Store the calulated argument vlaue
           }
           else {
-            Serial.println("Invalid Argument");   //Throws for too many arguments AND no arguments.
+            Serial.println("Invalid Argument");   //Throws for too many argument digits AND no argument digits.
             Serial.println();
           }
           break;                                  //Stop the loop once the carriage return is found.
